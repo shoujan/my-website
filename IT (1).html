@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #8b5cf6 100%);
+    }
+    .cyber-gradient {
+      background: linear-gradient(135deg, #0f172a 0%, #312e81 50%, #6d28d9 100%);
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    }
+    .sidebar-gradient {
+      background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+    }
+    .footer-gradient {
+      background: linear-gradient(90deg, #1e3a8a, #9333ea);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans">
+
+  <!-- Navigation -->
+  <nav class="cyber-gradient text-white py-4 sticky top-0 z-40 shadow-lg">
+    <div class="container mx-auto px-6 flex items-center justify-between">
+      <h1 class="text-lg font-semibold tracking-wide flex items-center gap-2">
+        <svg class="w-8 h-8" viewBox="0 0 40 40" fill="none">
+          <rect width="40" height="40" rx="8" fill="white" opacity="0.2"/>
+          <path d="M12 12h16v3H12z" fill="white"/>
+          <path d="M12 18h12v3H12z" fill="white"/>
+          <path d="M12 24h8v3H12z" fill="white"/>
+        </svg>
+        Tech Nepal Insights
+      </h1>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-12">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+      <!-- Article -->
+      <main class="lg:w-2/3">
+        <section class="mb-12">
+          <div class="bg-white rounded-lg shadow-lg p-8 card-hover">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Scope of Information Technology in Nepal 2025</h2>
+            <p class="text-gray-600 text-lg mb-6" style="text-align: justify;">
+              <b>By Shoujan Sapkota • Updated on February 5, 2025</b><br>
+              The year 2025 is a defining moment for Nepal’s digital transformation. The IT sector contributes an estimated <b>4.6% to Nepal’s GDP</b> (as per Nepal Rastra Bank, 2024). Over <b>60,000 professionals</b> are currently employed in IT and software services, and the number is growing rapidly with government incentives and global outsourcing demand.
+            </p>
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c" 
+                 alt="IT professionals working in Nepal" 
+                 class="rounded-lg mb-6 w-full object-cover" style="max-height: 420px;">
+            <p class="text-gray-600 leading-relaxed">
+              According to the <b>Ministry of Communication and Information Technology</b>, the “Digital Nepal Framework 2025” aims to create a tech-driven ecosystem across all sectors — from healthcare and education to governance. With <b>internet penetration reaching 95% of the population</b> and an increasing number of rural areas connected through 4G and fiber, Nepal’s digital journey is stronger than ever.
+            </p>
+          </div>
+        </section>
+
+        <!-- Key Areas -->
+        <section class="mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Key Areas of Growth in 2025</h2>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-lg card-hover">
+              <h3 class="font-semibold text-xl mb-2">🎓 Education & e-Learning</h3>
+              <p class="text-indigo-100 text-sm leading-relaxed">
+                Platforms like <b>Midas eClass</b>, <b>eTutors Nepal</b>, and <b>Digital Pathshala</b> have expanded access to education. As of 2024, over <b>700,000 students</b> in Nepal use online learning systems, according to the Ministry of Education.
+              </p>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg card-hover">
+              <h3 class="font-semibold text-xl mb-2">🚀 Startups & Innovation</h3>
+              <p class="text-green-100 text-sm leading-relaxed">
+                With IT parks in Banepa, Butwal, and Kathmandu, over <b>300+ startups</b> have been registered since 2022. Emerging fields like AI, cybersecurity, and blockchain are attracting youth entrepreneurs.
+              </p>
+            </div>
+            <div class="bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg card-hover">
+              <h3 class="font-semibold text-xl mb-2">🏢 Government Digitization</h3>
+              <p class="text-blue-100 text-sm leading-relaxed">
+                The government’s <b>“Smart Governance Initiative”</b> launched in 2023 is integrating e-services, digital signatures, and cloud-based citizen records.
+              </p>
+            </div>
+            <div class="bg-gradient-to-br from-pink-500 to-rose-600 text-white p-6 rounded-lg card-hover">
+              <h3 class="font-semibold text-xl mb-2">🌐 IT Exports & Remote Work</h3>
+              <p class="text-pink-100 text-sm leading-relaxed">
+                In 2024, Nepal exported <b>$78 million</b> worth of IT services globally. Remote freelancing has become a mainstream career for many skilled Nepali youths.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Future Vision -->
+        <section class="mb-12">
+          <div class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white rounded-lg p-8">
+            <h2 class="text-3xl font-bold mb-6">The Future of IT in Nepal</h2>
+            <p class="text-indigo-100 leading-relaxed mb-4">
+              Nepal’s IT sector is projected to grow by <b>12% annually through 2030</b>. The establishment of the <b>“National Innovation Center for Technology”</b> in 2024 is accelerating local software research and export potential.
+            </p>
+            <p class="text-indigo-100 leading-relaxed">
+              The next decade promises a Nepal powered by connectivity, code, and creativity — a future where digital skills become as essential as literacy itself.
+            </p>
+          </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section>
+          <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Conclusion</h2>
+            <p class="text-lg text-gray-600 leading-relaxed">
+              The IT sector in Nepal is evolving faster than ever. With proper investment, policy support, and skill-building programs, Nepal can position itself as a digital hub in South Asia by 2030.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="lg:w-1/3 space-y-8">
+        <!-- Editorial -->
+        <div class="sidebar-gradient rounded-lg p-6 border border-gray-200">
+          <div class="text-center mb-6">
+            <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <span class="text-white text-2xl font-bold">TN</span>
+            </div>
+            <h3 class="font-bold text-gray-800 text-lg">Tech Nepal Editorial</h3>
+            <p class="text-gray-600 text-sm">Insights into Nepal’s digital transformation</p>
+          </div>
+          <button class="cyber-gradient text-white px-6 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity w-full">
+            Follow Tech Nepal
+          </button>
+        </div>
+
+        <!-- Related News -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-xl font-bold mb-4 text-gray-800">📰 Related Tech News & Events</h3>
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1581092334964-6710a6b8c5e3" class="w-20 h-20 object-cover rounded-lg" />
+              <div>
+                <h4 class="text-sm font-semibold text-gray-800">Ncell launches AI-powered customer chatbot</h4>
+                <p class="text-xs text-gray-500">Jan 28, 2025</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1526378722484-bd91ca387e72" class="w-20 h-20 object-cover rounded-lg" />
+              <div>
+                <h4 class="text-sm font-semibold text-gray-800">Kathmandu hosts National ICT Startup Summit 2025</h4>
+                <p class="text-xs text-gray-500">Feb 2, 2025</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1581090700227-1c4a6f24f0e1" class="w-20 h-20 object-cover rounded-lg" />
+              <div>
+                <h4 class="text-sm font-semibold text-gray-800">Government announces new IT internship policy</h4>
+                <p class="text-xs text-gray-500">Jan 15, 2025</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer-gradient text-white py-8 mt-12">
+    <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+      <p class="text-sm">&copy; 2025 Tech Nepal Insights. All Rights Reserved.</p>
+      <div class="flex space-x-4 mt-4 md:mt-0">
+        <a href="#" class="hover:opacity-80">Facebook</a>
+        <a href="#" class="hover:opacity-80">Twitter</a>
+        <a href="#" class="hover:opacity-80">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
