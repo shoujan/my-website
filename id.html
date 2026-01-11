@@ -1,0 +1,757 @@
+<!-- index.html (REMADE — fixes “white output”)
+     WHY it was white before (most common):
+     - Some browsers fail on img.decode() with SVG blobs and the await chain stops.
+     FIX:
+     - No img.decode()
+     - Use SVG as data-URI + classic onload
+     - Cache loaded images
+     - Always draw something even if image fails
+
+     ✅ Same features: 10 logos, 10 photos, upload, signature, auto-fit text
+     ✅ Signature + Principal placed BELOW phone row (no collision)
+     ✅ No shadows, no signature background box
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ID Card Generator — Developed by Shoujan Sapkota</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .sig-font { font-family: "Great Vibes", cursive; }
+    .glass{
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.55);
+    }
+    .tiny-scroll::-webkit-scrollbar{height:8px;width:8px}
+    .tiny-scroll::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px}
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-100">
+
+<header class="sticky top-0 z-30 border-b border-white/60 bg-white/60 backdrop-blur">
+  <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="h-10 w-10 rounded-2xl bg-emerald-600/90 text-white grid place-items-center font-extrabold">ID</div>
+      <div>
+        <div class="font-extrabold tracking-tight text-slate-900">ID Card Generator</div>
+        <div class="text-xs text-slate-600">Generate a clean, modern school ID like your sample.</div>
+      </div>
+    </div>
+
+    <div class="text-right">
+      <div class="text-xs text-slate-500">Developed by</div>
+      <div class="font-bold text-emerald-700">SHOUJAN SAPKOTA</div>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-7xl px-4 py-8 grid lg:grid-cols-2 gap-6">
+  <!-- Controls -->
+  <section class="glass rounded-3xl p-5 md:p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-extrabold text-slate-900">Inputs</h2>
+      <button id="btnFillDemo" class="text-sm font-semibold px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition">
+        Fill Demo
+      </button>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <!-- School -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="font-bold text-slate-900 mb-2">School</div>
+
+        <label class="text-xs font-semibold text-slate-600">School Name</label>
+        <input id="schoolName" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+               value="FAUGET SCHOOL" />
+
+        <label class="mt-3 block text-xs font-semibold text-slate-600">School Address (line)</label>
+        <input id="schoolAddress" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+               value="123 Anywhere St., Any City, ST 12345" />
+
+        <div class="mt-4 flex items-center justify-between">
+          <div class="text-xs font-semibold text-slate-600">Logo</div>
+          <div class="flex items-center gap-2">
+            <button id="btnRandomLogo" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Random</button>
+            <label class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              Upload
+              <input id="logoUpload" type="file" accept="image/*" class="hidden"/>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-2 overflow-x-auto tiny-scroll">
+          <div id="logoChoices" class="flex gap-2 min-w-max"></div>
+        </div>
+      </div>
+
+      <!-- Person -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="font-bold text-slate-900 mb-2">Student / Staff</div>
+
+        <label class="text-xs font-semibold text-slate-600">Full Name</label>
+        <input id="personName" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+               value="Ketut Susilo" />
+
+        <label class="mt-3 block text-xs font-semibold text-slate-600">Class</label>
+        <input id="personClass" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+               value="IX A" />
+
+        <label class="mt-3 block text-xs font-semibold text-slate-600">Phone</label>
+        <input id="personPhone" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+               value="+123-456-7890" />
+
+        <div class="mt-4 flex items-center justify-between">
+          <div class="text-xs font-semibold text-slate-600">Profile Photo</div>
+          <div class="flex items-center gap-2">
+            <button id="btnRandomPhoto" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Random</button>
+            <label class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              Upload
+              <input id="photoUpload" type="file" accept="image/*" class="hidden"/>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-2 overflow-x-auto tiny-scroll">
+          <div id="photoChoices" class="flex gap-2 min-w-max"></div>
+        </div>
+      </div>
+
+      <!-- IDs -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="font-bold text-slate-900 mb-2">ID Numbers</div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-600">Date</label>
+            <input id="dateText" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+                   value="24, August 1999" />
+          </div>
+          <div class="flex items-end">
+            <button id="btnAutoDate" class="w-full text-sm font-semibold px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+              Auto Today
+            </button>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-600">ID No</label>
+            <input id="idNo" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+                   value="123-456-7890" />
+          </div>
+          <div class="flex items-end">
+            <button id="btnAutoId" class="w-full text-sm font-semibold px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+              Auto ID
+            </button>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-600">Reg No</label>
+            <input id="regNo" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+                   value="123-456-7890" />
+          </div>
+          <div class="flex items-end">
+            <button id="btnCopyIdToReg" class="w-full text-sm font-semibold px-3 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition">
+              Copy ID → Reg
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-4">
+        <div class="flex items-center justify-between mb-2">
+          <div class="font-bold text-slate-900">Signature (Watermark)</div>
+          <button id="btnRandomSig" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50">Random</button>
+        </div>
+
+        <div class="grid gap-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-600">Type Signature Text</label>
+            <input id="sigText" class="mt-1 w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600"
+                   placeholder="e.g., Fauget" value="Fauget"/>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-semibold text-slate-600">Or Upload Signature Image</div>
+            <label class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+              Upload
+              <input id="sigUpload" type="file" accept="image/*" class="hidden"/>
+            </label>
+          </div>
+
+          <div class="text-xs text-slate-500">Opacity</div>
+          <input id="sigOpacity" type="range" min="0.05" max="1" step="0.05" value="0.6" />
+        </div>
+
+        <div class="mt-3 overflow-x-auto tiny-scroll">
+          <div id="sigChoices" class="flex gap-2 min-w-max"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 grid sm:grid-cols-3 gap-3">
+      <button id="btnGenerate" class="sm:col-span-2 text-base font-extrabold px-4 py-3 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700 transition">
+        Generate ID Card
+      </button>
+      <button id="btnDownload" class="text-base font-bold px-4 py-3 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 transition">
+        Download PNG
+      </button>
+    </div>
+  </section>
+
+  <!-- Preview -->
+  <section class="glass rounded-3xl p-5 md:p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-extrabold text-slate-900">Preview</h2>
+      <div class="text-xs text-slate-500">Canvas render</div>
+    </div>
+
+    <div class="rounded-3xl bg-white p-4 border border-slate-200">
+      <canvas id="cardCanvas" width="1200" height="700" class="w-full h-auto rounded-2xl"></canvas>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ------------------ PRESETS ------------------ */
+const PRESET_ADDRESSES = [
+  "123 Anywhere St., Any City, ST 12345",
+  "77 River Rd., Green Town, CA 90210",
+  "18 Hill View Ave., Lake City, TX 73301",
+  "501 Sunset Blvd., Westside, FL 33101",
+  "9 Maple Street, North Point, NY 10001",
+  "220 Campus Dr., Spring Field, IL 62701",
+  "14 Garden Lane, Pleasanton, WA 98101",
+  "6 Ocean Way, Bay Harbor, OR 97201",
+  "31 Market Street, Downtown, CO 80202",
+  "100 School Rd., New City, AZ 85001",
+];
+
+const PRESET_SCHOOL_NAMES = [
+  "FAUGET SCHOOL",
+  "GREENFIELD HIGH SCHOOL",
+  "RIVERDALE ACADEMY",
+  "HORIZON PUBLIC SCHOOL",
+  "SUNRISE INTERNATIONAL",
+  "EVEREST MODEL SCHOOL",
+  "MAPLE LEAF SCHOOL",
+  "OAKRIDGE HIGH",
+  "CITY LIGHT ACADEMY",
+  "NOVA SCHOLARS SCHOOL",
+];
+
+const PRESET_SIG_TEXTS = [
+  "Fauget","Principal","Headmaster","Director","Registrar","Admin","Verified","Authority","Approved","Official",
+];
+
+const DEMO_NAMES = ["Ketut Susilo","Adam San","Shoujan Sapkota","Sourav Sapkota","Saujan Sapkota","Utsav Shrestha","Aarav Sharma","Mina Thapa","Riya Singh","John Carter"];
+const DEMO_CLASSES = ["IX A","X B","XI A","XII C","IX B","X A","XI C","XII A","IX C","X A"];
+
+/* ------------------ HELPERS ------------------ */
+const el = (id)=>document.getElementById(id);
+const canvas = el("cardCanvas");
+const ctx = canvas.getContext("2d");
+
+function randInt(n){ return Math.floor(Math.random()*n); }
+
+function formatToday() {
+  const d = new Date();
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return `${d.getDate()}, ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function makeId() {
+  const a = String(100 + randInt(900));
+  const b = String(100 + randInt(900));
+  const c = String(1000 + randInt(9000));
+  return `${a}-${b}-${c}`;
+}
+
+function roundRectPath(c, x,y,w,h,r){
+  const rr = Math.min(r, w/2, h/2);
+  c.beginPath();
+  c.moveTo(x+rr,y);
+  c.arcTo(x+w,y,x+w,y+h,rr);
+  c.arcTo(x+w,y+h,x,y+h,rr);
+  c.arcTo(x,y+h,x,y,rr);
+  c.arcTo(x,y,x+w,y,rr);
+  c.closePath();
+}
+
+function drawClippedImage(c, img, x,y,w,h,r){
+  c.save();
+  roundRectPath(c, x,y,w,h,r);
+  c.clip();
+
+  const iw = img.width, ih = img.height;
+  if (!iw || !ih) { c.restore(); return; }
+
+  const ir = iw/ih;
+  const rr = w/h;
+  let sw, sh, sx, sy;
+  if (ir > rr) { sh = ih; sw = ih*rr; sx = (iw - sw)/2; sy = 0; }
+  else { sw = iw; sh = iw/rr; sx = 0; sy = (ih - sh)/2; }
+
+  c.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  c.restore();
+}
+
+function fitText(c, text, maxW, fontBasePx, fontFamily, weight="700") {
+  let size = fontBasePx;
+  c.font = `${weight} ${size}px ${fontFamily}`;
+  while (c.measureText(text).width > maxW && size > 10) {
+    size -= 1;
+    c.font = `${weight} ${size}px ${fontFamily}`;
+  }
+  return size;
+}
+
+function drawBarcode(c, x,y,w,h, seedText){
+  c.save();
+  c.fillStyle = "#0E8A5C";
+  const seed = Array.from(seedText).reduce((a,ch)=>a+ch.charCodeAt(0),0) || 12345;
+  let r = seed;
+  function rnd(){ r = (r * 9301 + 49297) % 233280; return r / 233280; }
+  let px = x;
+  while (px < x+w){
+    const barW = 2 + Math.floor(rnd()*6);
+    const gap = 1 + Math.floor(rnd()*3);
+    const barH = h - Math.floor(rnd()*6);
+    c.globalAlpha = 0.95;
+    c.fillRect(px, y + (h-barH), barW, barH);
+    px += barW + gap;
+  }
+  c.restore();
+}
+
+/* ------------------ SVG (DATA URI) ------------------ */
+function svgDataUri(svg) {
+  // safe encoding for data-uri
+  const encoded = encodeURIComponent(svg)
+    .replace(/'/g, "%27")
+    .replace(/"/g, "%22");
+  return `data:image/svg+xml;charset=utf-8,${encoded}`;
+}
+
+function makeLogoSVG(seed = 0) {
+  const greens = ["#0E8A5C","#0B7A52","#159B65","#1FB26D","#0F9A68","#0A6B48","#0D8C5D","#0C7E55","#1AA86E","#0E7D57"];
+  const g = greens[seed % greens.length];
+  return `
+  <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+    <defs>
+      <linearGradient id="lg${seed}" x1="0" x2="1">
+        <stop offset="0" stop-color="${g}"/>
+        <stop offset="1" stop-color="#1FB26D"/>
+      </linearGradient>
+    </defs>
+    <rect width="160" height="160" rx="32" fill="white"/>
+    <circle cx="80" cy="80" r="64" fill="none" stroke="url(#lg${seed})" stroke-width="10"/>
+    <path d="M52 72 L80 58 L108 72 L80 86 Z" fill="${g}" opacity="0.95"/>
+    <path d="M60 78 L80 90 L100 78" fill="none" stroke="${g}" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="80" cy="104" r="14" fill="${g}" opacity="0.95"/>
+    <path d="M92 60 L118 70" stroke="${g}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="120" cy="71" r="4.5" fill="${g}"/>
+  </svg>`;
+}
+
+function makeAvatarSVG(name, seed = 0) {
+  const bg = ["#E8F5EE","#EAF3FF","#FFF1E6","#F3E8FF","#E6FFFA","#FFE4E6","#F1F5F9","#ECFEFF","#FEFCE8","#FDF2F8"][seed % 10];
+  const ring = ["#0E8A5C","#2563EB","#EA580C","#7C3AED","#0F766E","#DB2777","#0F172A","#0891B2","#CA8A04","#BE185D"][seed % 10];
+  const initials = (name || "A").trim().split(/\s+/).slice(0,2).map(s=>s[0]?.toUpperCase()||"A").join("");
+  return `
+  <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+    <defs>
+      <linearGradient id="av${seed}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="${ring}" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="${ring}" stop-opacity="0.6"/>
+      </linearGradient>
+    </defs>
+    <rect width="512" height="512" rx="64" fill="${bg}"/>
+    <circle cx="256" cy="256" r="188" fill="url(#av${seed})" opacity="0.12"/>
+    <circle cx="256" cy="220" r="86" fill="${ring}" opacity="0.22"/>
+    <path d="M128 420c30-92 96-128 128-128s98 36 128 128" fill="${ring}" opacity="0.18"/>
+    <circle cx="256" cy="256" r="210" fill="none" stroke="${ring}" stroke-width="16" opacity="0.65"/>
+    <text x="256" y="310" font-size="92" font-family="Inter, Arial" font-weight="800" text-anchor="middle" fill="${ring}" opacity="0.9">${initials}</text>
+  </svg>`;
+}
+
+/* ------------------ IMAGE LOADING + CACHE ------------------ */
+const cache = new Map(); // key -> HTMLImageElement
+
+function loadImage(url) {
+  return new Promise((resolve) => {
+    if (cache.has(url)) return resolve(cache.get(url));
+    const img = new Image();
+    img.onload = () => { cache.set(url, img); resolve(img); };
+    img.onerror = () => { resolve(null); };
+    img.src = url;
+  });
+}
+
+async function fileToImage(file) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+/* ------------------ STATE ------------------ */
+const state = {
+  logoIndex: 0,
+  photoIndex: 0,
+  sigIndex: 0,
+  customLogoImg: null,
+  customPhotoImg: null,
+  customSigImg: null,
+};
+
+/* ------------------ PICKERS ------------------ */
+function buildPickers() {
+  // Logos
+  const logoWrap = el("logoChoices");
+  logoWrap.innerHTML = "";
+  for (let i=0;i<10;i++){
+    const svg = makeLogoSVG(i);
+    const btn = document.createElement("button");
+    btn.className = "h-14 w-14 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition overflow-hidden grid place-items-center";
+    btn.innerHTML = svg.replace('width="160"','width="56"').replace('height="160"','height="56"');
+    btn.addEventListener("click", ()=>{ state.logoIndex=i; state.customLogoImg=null; renderCard(); });
+    logoWrap.appendChild(btn);
+  }
+
+  // Photos
+  const photoWrap = el("photoChoices");
+  photoWrap.innerHTML = "";
+  for (let i=0;i<10;i++){
+    const svg = makeAvatarSVG(el("personName").value || "Student", i);
+    const btn = document.createElement("button");
+    btn.className = "h-14 w-14 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition overflow-hidden grid place-items-center";
+    btn.innerHTML = svg.replace('width="512"','width="56"').replace('height="512"','height="56"');
+    btn.addEventListener("click", ()=>{ state.photoIndex=i; state.customPhotoImg=null; renderCard(); });
+    photoWrap.appendChild(btn);
+  }
+
+  // Signatures
+  const sigWrap = el("sigChoices");
+  sigWrap.innerHTML = "";
+  for (let i=0;i<10;i++){
+    const btn = document.createElement("button");
+    btn.className = "px-3 py-2 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left";
+    btn.innerHTML = `
+      <div class="text-[11px] text-slate-500 font-semibold">Preset</div>
+      <div class="sig-font text-xl text-emerald-700 leading-none">${PRESET_SIG_TEXTS[i]}</div>
+    `;
+    btn.addEventListener("click", ()=>{
+      state.sigIndex=i; state.customSigImg=null;
+      el("sigText").value = PRESET_SIG_TEXTS[i];
+      renderCard();
+    });
+    sigWrap.appendChild(btn);
+  }
+}
+
+/* ------------------ UPLOADS ------------------ */
+el("logoUpload").addEventListener("change", async (e)=>{
+  const f = e.target.files?.[0];
+  if (!f) return;
+  state.customLogoImg = await fileToImage(f);
+  renderCard();
+});
+el("photoUpload").addEventListener("change", async (e)=>{
+  const f = e.target.files?.[0];
+  if (!f) return;
+  state.customPhotoImg = await fileToImage(f);
+  renderCard();
+});
+el("sigUpload").addEventListener("change", async (e)=>{
+  const f = e.target.files?.[0];
+  if (!f) return;
+  state.customSigImg = await fileToImage(f);
+  renderCard();
+});
+
+/* ------------------ RENDER ------------------ */
+async function renderCard() {
+  try {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const W = canvas.width, H = canvas.height;
+
+    // Always draw a base so it's never white/blank if something fails later
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0,0,W,H);
+
+    // Clip rounded
+    ctx.save();
+    roundRectPath(ctx, 0,0,W,H,36);
+    ctx.clip();
+
+    // Subtle diamond pattern
+    ctx.save();
+    ctx.globalAlpha = 0.05;
+    ctx.strokeStyle = "#0f172a";
+    ctx.lineWidth = 2;
+    for (let y=-200; y<H+200; y+=90){
+      for (let x=-200; x<W+200; x+=90){
+        ctx.beginPath();
+        ctx.moveTo(x+45,y);
+        ctx.lineTo(x+90,y+45);
+        ctx.lineTo(x+45,y+90);
+        ctx.lineTo(x,y+45);
+        ctx.closePath();
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // Top-right swoosh
+    ctx.save();
+    ctx.fillStyle = "#0B7A52";
+    ctx.beginPath();
+    ctx.moveTo(W*0.48,0);
+    ctx.quadraticCurveTo(W*0.78,0, W, H*0.12);
+    ctx.lineTo(W,H*0.28);
+    ctx.quadraticCurveTo(W*0.62, H*0.36, W*0.44, H*0.22);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "#1FB26D";
+    ctx.beginPath();
+    ctx.moveTo(W*0.36,0);
+    ctx.quadraticCurveTo(W*0.62,0, W*0.9, H*0.11);
+    ctx.quadraticCurveTo(W*0.72, H*0.13, W*0.58, H*0.2);
+    ctx.quadraticCurveTo(W*0.48, H*0.24, W*0.38, H*0.18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Bottom-left swoosh
+    ctx.save();
+    ctx.fillStyle = "#0B7A52";
+    ctx.beginPath();
+    ctx.moveTo(0,H);
+    ctx.quadraticCurveTo(W*0.08, H*0.76, W*0.26, H*0.76);
+    ctx.quadraticCurveTo(W*0.14, H*0.86, 0, H*0.86);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "#1FB26D";
+    ctx.beginPath();
+    ctx.moveTo(0,H);
+    ctx.quadraticCurveTo(W*0.12, H*0.82, W*0.3, H*0.82);
+    ctx.quadraticCurveTo(W*0.18, H*0.92, 0, H*0.92);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    const pad = 56;
+
+    const schoolName = (el("schoolName").value || "SCHOOL").trim();
+    const schoolAddr = (el("schoolAddress").value || "").trim();
+    const personName = (el("personName").value || "—").trim();
+    const dateText = (el("dateText").value || "—").trim();
+    const idNo = (el("idNo").value || makeId()).trim();
+    const regNo = (el("regNo").value || "—").trim();
+    const personClass = (el("personClass").value || "—").trim();
+    const personPhone = (el("personPhone").value || "—").trim();
+
+    // Logo image
+    let logoImg = state.customLogoImg;
+    if (!logoImg) {
+      const url = svgDataUri(makeLogoSVG(state.logoIndex));
+      logoImg = await loadImage(url);
+    }
+
+    // Draw logo
+    const logoX = pad, logoY = 44;
+    if (logoImg) drawClippedImage(ctx, logoImg, logoX, logoY, 64, 64, 18);
+
+    // Left stacked title
+    ctx.fillStyle = "#0B7A52";
+    const leftTitleX = logoX + 80;
+    const leftTitleY = 86;
+
+    const sizeLeft = fitText(ctx, schoolName, 320, 40, "Inter", "800");
+    ctx.font = `800 ${sizeLeft}px Inter`;
+    ctx.fillText(schoolName.split(" ").slice(0,1).join(" "), leftTitleX, leftTitleY-16);
+    ctx.fillText(schoolName.split(" ").slice(1).join(" ") || "", leftTitleX, leftTitleY+22);
+
+    // Top-right header
+    ctx.fillStyle = "#FFFFFF";
+    const rightHeaderX = W*0.60;
+    const rightHeaderY = 86;
+
+    const sizeRH = fitText(ctx, schoolName, W - rightHeaderX - pad, 44, "Inter", "900");
+    ctx.font = `900 ${sizeRH}px Inter`;
+    ctx.fillText(schoolName, rightHeaderX, rightHeaderY);
+
+    ctx.globalAlpha = 0.95;
+    const addrSize = fitText(ctx, schoolAddr, W - rightHeaderX - pad, 18, "Inter", "500");
+    ctx.font = `500 ${addrSize}px Inter`;
+    ctx.fillText(schoolAddr, rightHeaderX, rightHeaderY+28);
+    ctx.globalAlpha = 1;
+
+    // Photo image
+    let photoImg = state.customPhotoImg;
+    if (!photoImg) {
+      const url = svgDataUri(makeAvatarSVG(personName, state.photoIndex));
+      photoImg = await loadImage(url);
+    }
+
+    // Photo box
+    const photoBoxX = pad, photoBoxY = 170, photoBoxW = 340, photoBoxH = 300;
+
+    ctx.save();
+    ctx.fillStyle = "#E5E7EB";
+    ctx.globalAlpha = 0.55;
+    roundRectPath(ctx, photoBoxX, photoBoxY, photoBoxW, photoBoxH, 28);
+    ctx.fill();
+    ctx.restore();
+
+    if (photoImg) drawClippedImage(ctx, photoImg, photoBoxX+16, photoBoxY+16, photoBoxW-32, photoBoxH-32, 24);
+
+    // Barcode
+    drawBarcode(ctx, photoBoxX+16, photoBoxY+photoBoxH+18, photoBoxW-32, 54, idNo);
+
+    // Details
+    const labelX = W*0.46;
+    const valueX = W*0.62;
+    const startY = 240;
+    const lineH = 56;
+
+    const details = [
+      ["Name", personName],
+      ["Date", dateText],
+      ["Id No", idNo],
+      ["Class", personClass],
+      ["Reg No", regNo],
+      ["Phone", personPhone],
+    ];
+
+    ctx.fillStyle = "#0B7A52";
+    for (let i=0;i<details.length;i++){
+      const y = startY + i*lineH;
+
+      ctx.font = `500 34px Inter`;
+      ctx.fillText(details[i][0], labelX, y);
+
+      ctx.fillText(":", labelX + 160, y);
+
+      const v = details[i][1];
+      const maxW = W - valueX - pad;
+      const vSize = fitText(ctx, v, maxW, 34, "Inter", "500");
+      ctx.font = `500 ${vSize}px Inter`;
+      ctx.fillText(v, valueX, y);
+    }
+
+    // Signature + Principal (below phone row)
+    const detailsBottomY = startY + (details.length - 1) * lineH;
+    const sigAreaX = W * 0.68;
+    const sigAreaY = detailsBottomY + 40;
+    const sigAreaW = W - sigAreaX - pad;
+    const sigOpacity = parseFloat(el("sigOpacity").value || "0.6");
+
+    if (state.customSigImg) {
+      ctx.save();
+      ctx.globalAlpha = sigOpacity;
+      drawClippedImage(ctx, state.customSigImg, sigAreaX+12, sigAreaY+6, sigAreaW-24, 78, 12);
+      ctx.restore();
+    } else {
+      const sigText = (el("sigText").value || PRESET_SIG_TEXTS[state.sigIndex] || "Signature").trim();
+      ctx.save();
+      ctx.globalAlpha = sigOpacity;
+      ctx.fillStyle = "#0B7A52";
+      const sigFontSize = fitText(ctx, sigText, sigAreaW-24, 64, '"Great Vibes"', "400");
+      ctx.font = `400 ${sigFontSize}px "Great Vibes"`;
+      ctx.fillText(sigText, sigAreaX+12, sigAreaY+58);
+      ctx.restore();
+    }
+
+    ctx.fillStyle = "#0B7A52";
+    ctx.font = `500 28px Inter`;
+    ctx.fillText("Principal", sigAreaX+12, sigAreaY+112);
+
+    ctx.restore(); // end clip
+  } catch (err) {
+    // If anything breaks, still show something and log the real reason.
+    console.error("Render failed:", err);
+  }
+}
+
+/* ------------------ UI EVENTS ------------------ */
+function hookLive(ids){
+  ids.forEach(id => el(id).addEventListener("input", ()=>{
+    buildPickers(); // refresh avatar thumbs when name changes
+    renderCard();
+  }));
+}
+
+el("btnGenerate").addEventListener("click", ()=>{ buildPickers(); renderCard(); });
+el("btnDownload").addEventListener("click", ()=>{
+  const a = document.createElement("a");
+  a.download = "id-card.png";
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+});
+
+el("btnAutoDate").addEventListener("click", ()=>{ el("dateText").value = formatToday(); renderCard(); });
+el("btnAutoId").addEventListener("click", ()=>{ el("idNo").value = makeId(); renderCard(); });
+el("btnCopyIdToReg").addEventListener("click", ()=>{ el("regNo").value = el("idNo").value.trim(); renderCard(); });
+
+el("btnRandomLogo").addEventListener("click", ()=>{ state.logoIndex = randInt(10); state.customLogoImg=null; renderCard(); });
+el("btnRandomPhoto").addEventListener("click", ()=>{ state.photoIndex = randInt(10); state.customPhotoImg=null; renderCard(); });
+el("btnRandomSig").addEventListener("click", ()=>{
+  const r = randInt(10);
+  state.sigIndex = r;
+  state.customSigImg = null;
+  el("sigText").value = PRESET_SIG_TEXTS[r];
+  renderCard();
+});
+
+el("btnFillDemo").addEventListener("click", ()=>{
+  const i = randInt(10);
+  el("schoolName").value = PRESET_SCHOOL_NAMES[i];
+  el("schoolAddress").value = PRESET_ADDRESSES[i];
+  el("personName").value = DEMO_NAMES[i];
+  el("personClass").value = DEMO_CLASSES[i];
+  el("personPhone").value = `+1${randInt(9)}${randInt(9)}${randInt(9)}-${100+randInt(900)}-${1000+randInt(9000)}`;
+  el("dateText").value = formatToday();
+  el("idNo").value = makeId();
+  el("regNo").value = el("idNo").value;
+  el("sigText").value = PRESET_SIG_TEXTS[i];
+
+  state.logoIndex = i;
+  state.photoIndex = i;
+  state.sigIndex = i;
+  state.customLogoImg = null;
+  state.customPhotoImg = null;
+  state.customSigImg = null;
+
+  buildPickers();
+  renderCard();
+});
+
+hookLive(["schoolName","schoolAddress","personName","personClass","personPhone","dateText","idNo","regNo","sigText","sigOpacity"]);
+
+/* ------------------ INIT ------------------ */
+window.addEventListener("load", ()=>{
+  buildPickers();
+  renderCard();
+});
+</script>
+
+</body>
+</html>
