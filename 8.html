@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HIMALCRAFT: Heart of Nepal</title>
+<style>
+ html,body{margin:0;height:100%;background:#0a0814;color:#ffd24a;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;text-align:center}
+ a{color:#7fdc8a}
+</style>
+<script>
+// Redirect to the game, PRESERVING query params (?join=ROOMID multiplayer links) and hash.
+location.replace("g.html"+location.search+location.hash);
+</script>
+</head>
+<body>
+<div>
+  <h1>🏔 HIMALCRAFT</h1>
+  <p>Loading the game…</p>
+  <p>If nothing happens, <a id="lnk" href="g.html">tap here to play</a>.</p>
+  <script>document.getElementById("lnk").href="g.html"+location.search+location.hash;</script>
+</div>
+</body>
+</html>
