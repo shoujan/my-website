@@ -766,6 +766,43 @@
 </script>
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7398186706249320"
      crossorigin="anonymous"></script>
+	<script>
+(function(){
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbygDvLIsDH99WcR3JVLezXO891kOt_H2TEHE8yihXv9h-rUXFffJ2IXApOfgu0vBT9m/exec';  // <-- paste your Apps Script URL here
+  var SITE_ID  = 'main page';                        // <-- unique ID for this page/site
+  var SITE_NAME= 'shoujan sapkota';                        // <-- friendly name shown in dashboard
+
+  var ua = navigator.userAgent;
+  var d = {
+    site_id:    SITE_ID,
+    site_name:  SITE_NAME,
+    page_url:   location.href,
+    page_title: document.title,
+    referrer:   document.referrer || 'Direct',
+    device:     /Mobi|Android/i.test(ua) ? 'Mobile' : 'Desktop',
+    browser:    /Firefox/i.test(ua)?'Firefox':/Edg/i.test(ua)?'Edge':/Chrome/i.test(ua)?'Chrome':/Safari/i.test(ua)?'Safari':'Other',
+    os:         /Windows/i.test(ua)?'Windows':/Mac OS/i.test(ua)?'macOS':/Android/i.test(ua)?'Android':/(iPhone|iPad)/i.test(ua)?'iOS':/(Linux)/i.test(ua)?'Linux':'Other',
+    screen:     screen.width + 'x' + screen.height,
+    language:   navigator.language,
+    timezone:   Intl ? Intl.DateTimeFormat().resolvedOptions().timeZone : ''
+  };
+
+  function ping(){
+    try{
+      fetch(ENDPOINT, {
+        method:  'POST',
+        headers: {'Content-Type':'application/json'},
+        body:    JSON.stringify(d),
+        mode:    'no-cors'
+      }).catch(function(){});
+    }catch(e){}
+  }
+
+  if(document.readyState==='complete') ping();
+  else window.addEventListener('load', ping);
+})();
+</script>
+}
 
 </body>
 </html>
