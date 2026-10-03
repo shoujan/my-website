@@ -86,8 +86,8 @@
         </div>
 
         <iframe
-            src="https://kiranasathi.ai.studio"
-            title="Kirana Sathi"
+            src="https://biz360.ai.studio"
+            title="BIZ360"
             allow="camera; microphone; geolocation; clipboard-read; clipboard-write; fullscreen"
             allowfullscreen>
         </iframe>
